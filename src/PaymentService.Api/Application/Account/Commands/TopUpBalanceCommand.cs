@@ -26,8 +26,7 @@ public class TopUpBalanceCommandHandler : IRequestHandler<TopUpBalanceCommand, B
     public async Task<BalanceOperationResponse> Handle(TopUpBalanceCommand request, CancellationToken cancellationToken)
     {
         var account = await _context.Accounts
-            .Where(a => a.CustomerId == request.TopUpRequest.CustomerId && a.IsDeleted == false)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(a=> a.CustomerId == request.TopUpRequest.CustomerId, cancellationToken);
 
         if (account == null)
         {
@@ -48,13 +47,11 @@ public class TopUpBalanceCommandHandler : IRequestHandler<TopUpBalanceCommand, B
         await _context.SaveChangesAsync(cancellationToken);
         
         await _publishEndpoint.Publish(
-            new BalanceIncreaseEvent()
+            new AccountUpdatedEvent
             {
-                Id = account.Id,
-                TransactionId = transaction.Id,
-                Amount = request.TopUpRequest.Amount,
-                CurrentBalance = account.Balance,
-                IncreasedOnUtc = DateTime.UtcNow,
+               Id = account.Id,
+               Balance = account.Balance,
+               UpdatedOnUtc = DateTime.UtcNow
             },
             cancellationToken);
 

@@ -27,8 +27,7 @@ public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceComm
         CancellationToken cancellationToken)
     {
         var account = await _context.Accounts
-            .Where(a => a.CustomerId == request.WithdrawRequest.CustomerId && a.IsDeleted == false)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(a => a.CustomerId == request.WithdrawRequest.CustomerId, cancellationToken);
 
         if (account == null)
         {
@@ -56,13 +55,11 @@ public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceComm
         await _context.SaveChangesAsync(cancellationToken);
 
         await _publishEndpoint.Publish(
-            new BalanceDecreaseEvent()
+            new AccountUpdatedEvent
             {
                 Id = account.Id,
-                TransactionId = transaction.Id,
-                Amount = request.WithdrawRequest.Amount,
-                CurrentBalance = account.Balance,
-                DecreasedOnUtc = DateTime.UtcNow
+                Balance = account.Balance,
+                UpdatedOnUtc = DateTime.UtcNow
             },
             cancellationToken);
 

@@ -23,8 +23,7 @@ public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand,
     public async Task<bool> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
         var account = await _context.Accounts
-            .Where(a => a.CustomerId == request.CustomerId && a.IsDeleted == false)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(a => a.CustomerId == request.CustomerId, cancellationToken);
 
         if (account == null)
         {
@@ -32,20 +31,15 @@ public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand,
         }
 
         account.IsDeleted = true;
-        var result = await _context.SaveChangesAsync(cancellationToken);
-        
-        if (result > 0)
-        {
-            await _publishEndpoint.Publish(
-                new AccountDeletedEvent()
-                {
-                    Id = account.Id,
-                    DeletedOnUtc = DateTime.UtcNow
-                },
-                cancellationToken);
-            return true;
-        }
+        await _context.SaveChangesAsync(cancellationToken);
 
-        return false;
+        await _publishEndpoint.Publish(
+            new AccountDeletedEvent()
+            {
+                Id = account.Id,
+                DeletedOnUtc = DateTime.UtcNow
+            },
+            cancellationToken);
+        return true;
     }
 }

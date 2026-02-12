@@ -24,8 +24,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
     public async Task<AccountResponse> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
     {
         var existingAccount = await _context.Accounts
-            .Where(a => a.CustomerId == request.CustomerId && a.IsDeleted == false)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(a => a.CustomerId == request.CustomerId, cancellationToken);
 
         if (existingAccount != null)
         {
@@ -34,7 +33,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
 
         Domain.Entities.AccountEntity accountEntity = new Domain.Entities.AccountEntity()
         {
-            AccountNumber = Random.Shared.NextInt64(1000000000000, 9999999999999).ToString(),
+            AccountNumber = Guid.NewGuid().ToString(),
             CustomerId = request.CustomerId,
         };
 
