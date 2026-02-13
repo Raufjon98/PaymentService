@@ -21,8 +21,7 @@ public class GetCustomerBalanceQueryHandler : IRequestHandler<GetCustomerBalance
         CancellationToken cancellationToken)
     {
         var account = await _context.Accounts
-            .Where(a => a.CustomerId == request.CustomerId && a.IsDeleted == false)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(a => a.CustomerId == request.CustomerId, cancellationToken);
 
         if (account == null)
         {
