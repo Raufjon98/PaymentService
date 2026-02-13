@@ -1,7 +1,9 @@
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Api.Application.Common.Exceptions;
 using PaymentService.Api.Infrastructure.Data;
+using PaymentService.Contracts.Account.Events;
 using PaymentService.Contracts.Account.Requests;
 using PaymentService.Contracts.Account.Responses;
 using PaymentService.Contracts.Transaction.Enum;
@@ -13,17 +15,18 @@ public record TopUpBalanceCommand(TopUpRequest TopUpRequest) : IRequest<BalanceO
 public class TopUpBalanceCommandHandler : IRequestHandler<TopUpBalanceCommand, BalanceOperationResponse>
 {
     private readonly ApplicationDbContext _context;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public TopUpBalanceCommandHandler(ApplicationDbContext context)
+    public TopUpBalanceCommandHandler(ApplicationDbContext context, IPublishEndpoint publishEndpoint)
     {
         _context = context;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<BalanceOperationResponse> Handle(TopUpBalanceCommand request, CancellationToken cancellationToken)
     {
         var account = await _context.Accounts
-            .Where(a=> a.CustomerId == request.TopUpRequest.CustomerId && a.IsDeleted == false)
-            .FirstOrDefaultAsync( cancellationToken);
+            .FirstOrDefaultAsync(a=> a.CustomerId == request.TopUpRequest.CustomerId, cancellationToken);
 
         if (account == null)
         {
@@ -42,6 +45,15 @@ public class TopUpBalanceCommandHandler : IRequestHandler<TopUpBalanceCommand, B
         };
         await _context.Transactions.AddAsync(transaction, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+        
+        await _publishEndpoint.Publish(
+            new AccountUpdatedEvent
+            {
+               Id = account.Id,
+               Balance = account.Balance,
+               UpdatedOnUtc = DateTime.UtcNow
+            },
+            cancellationToken);
 
         return new BalanceOperationResponse()
         {

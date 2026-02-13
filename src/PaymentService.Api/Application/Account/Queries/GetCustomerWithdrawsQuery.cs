@@ -23,7 +23,6 @@ public class GetCustomerWithdrawsQueryHandler : IRequestHandler<GetCustomerWithd
             .Include(t => t.Account)
             .Where(t => t.Account != null
                         && t.Account.CustomerId == request.CustomerId
-                        && t.Account.IsDeleted == false
                         && t.TransactionType == TransactionType.Expense)
             .Select(t =>  new TransactionResult
             {

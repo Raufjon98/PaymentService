@@ -21,8 +21,7 @@ public class GetCustomerTransactionsQueryHandler : IRequestHandler<GetCustomerTr
         var transactions = await _context.Transactions
             .Include(t=> t.Account)
             .Where(t => t.Account != null 
-                        && t.Account.CustomerId == request.CustomerId
-                        && t.Account.IsDeleted == false)
+                        && t.Account.CustomerId == request.CustomerId)
             .Select(t => new TransactionResult
             {   
                 SourceId = t.SourceId,

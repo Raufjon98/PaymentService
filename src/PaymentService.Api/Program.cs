@@ -1,4 +1,5 @@
 using System.Reflection;
+using MassTransit;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Api.Infrastructure.Data;
@@ -6,6 +7,7 @@ using PaymentService.Api.MagicOnion.Services;
 using PaymentService.Contracts.Interfaces;
 using MediatR;
 using PaymentService.Api.Infrastructure.Interceptors;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -18,6 +20,19 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions.Protocols = HttpProtocols.Http2;
     });
 });
+
+var rabbitConnectionString = builder.Configuration["MessageBroker:Host"];
+
+builder.Services.AddMassTransit(configuration =>
+{
+    configuration.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host(rabbitConnectionString);
+        cfg.ExchangeType = ExchangeType.Fanout;
+        cfg.ConfigureEndpoints(ctx);
+    });
+});
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddGrpc(options =>
 {

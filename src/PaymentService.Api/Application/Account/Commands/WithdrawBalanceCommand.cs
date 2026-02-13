@@ -1,7 +1,9 @@
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Api.Application.Common.Exceptions;
 using PaymentService.Api.Infrastructure.Data;
+using PaymentService.Contracts.Account.Events;
 using PaymentService.Contracts.Account.Requests;
 using PaymentService.Contracts.Account.Responses;
 using PaymentService.Contracts.Transaction.Enum;
@@ -13,18 +15,20 @@ public record WithdrawBalanceCommand(WithdrawRequest WithdrawRequest) : IRequest
 public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceCommand, BalanceOperationResponse>
 {
     private readonly ApplicationDbContext _context;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public WithdrawBalanceCommandHandler(ApplicationDbContext context)
+    public WithdrawBalanceCommandHandler(ApplicationDbContext context, IPublishEndpoint publishEndpoint)
     {
         _context = context;
+        _publishEndpoint = publishEndpoint;
     }
 
-    public async Task<BalanceOperationResponse> Handle(WithdrawBalanceCommand request, CancellationToken cancellationToken)
+    public async Task<BalanceOperationResponse> Handle(WithdrawBalanceCommand request,
+        CancellationToken cancellationToken)
     {
         var account = await _context.Accounts
-            .Where(a=>  a.CustomerId == request.WithdrawRequest.CustomerId  && a.IsDeleted == false)
-            .FirstOrDefaultAsync(cancellationToken);
-        
+            .FirstOrDefaultAsync(a => a.CustomerId == request.WithdrawRequest.CustomerId, cancellationToken);
+
         if (account == null)
         {
             throw new NotFoundException(nameof(Account), request.WithdrawRequest.CustomerId.ToString());
@@ -32,12 +36,12 @@ public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceComm
 
         if (account.Balance < request.WithdrawRequest.Amount)
         {
-            throw new Exception("Insufficient balance"); 
+            throw new Exception("Insufficient balance");
         }
 
         account.Balance -= request.WithdrawRequest.Amount;
         _context.Accounts.Update(account);
-       
+
         var transaction = new Domain.Entities.TransactionEntity
         {
             AccountId = account.Id,
@@ -46,10 +50,19 @@ public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceComm
             Status = TransationStatus.Completed,
             SourceId = request.WithdrawRequest.SourceId,
         };
-        
-        await _context.Transactions.AddAsync(transaction, cancellationToken); 
+
+        await _context.Transactions.AddAsync(transaction, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
-        
+
+        await _publishEndpoint.Publish(
+            new AccountUpdatedEvent
+            {
+                Id = account.Id,
+                Balance = account.Balance,
+                UpdatedOnUtc = DateTime.UtcNow
+            },
+            cancellationToken);
+
         return new BalanceOperationResponse()
         {
             Balance = account.Balance,
