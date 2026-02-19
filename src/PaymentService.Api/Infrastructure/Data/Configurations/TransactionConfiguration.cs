@@ -9,10 +9,20 @@ public class TransactionConfiguration : IEntityTypeConfiguration<TransactionEnti
     public void Configure(EntityTypeBuilder<TransactionEntity> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.HasQueryFilter(x => !x.IsDeleted);
+        builder.Property(x => x.SourceId)
+            .IsRequired()
+            .HasMaxLength(50);
+        builder.Property(x => x.Amount)
+            .HasColumnType("decimal(18,2)")
+            .IsRequired();
+        builder.Property(x => x.AccountId).IsRequired();
+        builder.HasIndex(x => x.AccountId);
+        
         builder.HasOne(x => x.Account)
             .WithMany(x => x.Transactions)
             .HasForeignKey(x => x.AccountId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }
