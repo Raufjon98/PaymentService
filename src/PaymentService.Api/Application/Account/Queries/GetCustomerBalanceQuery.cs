@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Api.Application.Common.Exceptions;
+using PaymentService.Api.Domain.Entities;
 using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Account.Responses;
 
@@ -25,7 +26,7 @@ public class GetCustomerBalanceQueryHandler : IRequestHandler<GetCustomerBalance
 
         if (account == null)
         {
-            throw new NotFoundException(nameof(Account), request.CustomerId.ToString());
+            throw new NotFoundException(nameof(AccountEntity), request.CustomerId.ToString());
         }
 
         return new BalanceOperationResponse

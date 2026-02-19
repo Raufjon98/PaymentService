@@ -23,15 +23,18 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var rabbitConnectionString = builder.Configuration["MessageBroker:Host"];
 
-builder.Services.AddMassTransit(configuration =>
+if (!builder.Environment.IsEnvironment("IntegrationTest"))
 {
-    configuration.UsingRabbitMq((ctx, cfg) =>
+    builder.Services.AddMassTransit(configuration =>
     {
-        cfg.Host(rabbitConnectionString);
-        cfg.ExchangeType = ExchangeType.Fanout;
-        cfg.ConfigureEndpoints(ctx);
+        configuration.UsingRabbitMq((ctx, cfg) =>
+        {
+            cfg.Host(rabbitConnectionString);
+            cfg.ExchangeType = ExchangeType.Fanout;
+            cfg.ConfigureEndpoints(ctx);
+        });
     });
-});
+}
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddGrpc(options =>
