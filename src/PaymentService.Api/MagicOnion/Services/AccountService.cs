@@ -60,7 +60,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
         return result;
     }
 
-    public async UnaryResult<List<TransactionResult>> GetCustomerWithdrasAsync(Guid customerId)
+    public async UnaryResult<List<TransactionResult>> GetCustomerWithdrawsAsync(Guid customerId)
     {
         var query = new GetCustomerWithdrawsQuery(customerId);
         var result = await _mediator.Send(query);

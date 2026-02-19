@@ -13,7 +13,7 @@ public interface IAccountService : IService<IAccountService>
     UnaryResult<BalanceOperationResponse> WithdrawBalanceAsync(WithdrawRequest withdrawRequest);
     UnaryResult<BalanceOperationResponse> GetCustomerBalanceAsync(Guid customerId);
     UnaryResult<List<TransactionResult>> GetCustomerToUpsAsync(Guid customerId);
-    UnaryResult<List<TransactionResult>> GetCustomerWithdrasAsync(Guid customerId);
+    UnaryResult<List<TransactionResult>> GetCustomerWithdrawsAsync(Guid customerId);
     UnaryResult<List<TransactionResult>> GetCustomerTransactionsAsync(Guid customerId);
     UnaryResult<bool> DeleteAccountAsync(Guid customerId);
 }

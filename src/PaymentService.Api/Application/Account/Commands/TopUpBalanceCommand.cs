@@ -2,6 +2,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Api.Application.Common.Exceptions;
+using PaymentService.Api.Domain.Entities;
 using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Account.Events;
 using PaymentService.Contracts.Account.Requests;
@@ -30,7 +31,7 @@ public class TopUpBalanceCommandHandler : IRequestHandler<TopUpBalanceCommand, B
 
         if (account == null)
         {
-            throw new NotFoundException(nameof(Account), request.TopUpRequest.CustomerId.ToString());
+            throw new NotFoundException(nameof(AccountEntity), request.TopUpRequest.CustomerId.ToString());
         }
 
         account.Balance += request.TopUpRequest.Amount;
