@@ -9,6 +9,16 @@ public class AccountConfiguration : IEntityTypeConfiguration<AccountEntity>
     public void Configure(EntityTypeBuilder<AccountEntity> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.AccountNumber)
+            .IsRequired()
+            .HasMaxLength(50);
+        builder.Property(x=>x.CustomerId).IsRequired();
+        builder.Property(x=>x.Balance)
+            .HasColumnType("decimal(18,2)")
+            .IsRequired();
+        builder.Property(x=>x.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }
