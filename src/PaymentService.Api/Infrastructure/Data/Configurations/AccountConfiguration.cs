@@ -16,9 +16,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<AccountEntity>
         builder.Property(x=>x.Balance)
             .HasColumnType("decimal(18,2)")
             .IsRequired();
-        builder.Property(x=>x.IsActive)
-            .IsRequired()
-            .HasDefaultValue(true);
+     
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

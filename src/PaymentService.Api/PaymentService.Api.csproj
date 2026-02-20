@@ -25,6 +25,7 @@
     </PackageReference>
     <PackageReference Include="Npgsql" Version="9.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageReference Include="OrderService.Contracts" Version="1.2.1" />
   </ItemGroup>
 
   <ItemGroup>

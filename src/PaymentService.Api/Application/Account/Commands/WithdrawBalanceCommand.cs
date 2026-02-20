@@ -54,7 +54,7 @@ public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceComm
         await _context.Transactions.AddAsync(transaction, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        await _publishEndpoint.Publish(
+        var publishAccountChangedEventTask = _publishEndpoint.Publish(
             new AccountUpdatedEvent
             {
                 Id = account.Id,
@@ -62,6 +62,18 @@ public class WithdrawBalanceCommandHandler : IRequestHandler<WithdrawBalanceComm
                 UpdatedOnUtc = DateTime.UtcNow
             },
             cancellationToken);
+        
+        var publishWithdrawalEventTask = _publishEndpoint.Publish(
+            new WithdrawBalanceEvent
+            {
+                SourceId = request.WithdrawRequest.SourceId,
+                CustomerId = account.CustomerId,
+                Amount = transaction.Amount,
+                TransactionStatus = transaction.Status,
+            },
+            cancellationToken);
+        
+        await Task.WhenAll(publishAccountChangedEventTask, publishWithdrawalEventTask);
 
         return new BalanceOperationResponse()
         {
