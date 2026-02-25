@@ -4,7 +4,7 @@ using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Transaction.Enum;
 using PaymentService.Contracts.Transaction.Responses;
 
-namespace PaymentService.Api.Application.Account.Queries;
+namespace PaymentService.Api.Application.Account.Queries.GetCustomerTopUps;
 
 public record GetCustomerTopUpsQuery(Guid CustomerId) : IRequest<List<TransactionResult>>;
 

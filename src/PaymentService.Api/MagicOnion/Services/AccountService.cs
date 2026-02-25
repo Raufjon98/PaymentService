@@ -1,8 +1,15 @@
 using MagicOnion;
 using MagicOnion.Server;
 using MediatR;
-using PaymentService.Api.Application.Account.Commands;
-using PaymentService.Api.Application.Account.Queries;
+using PaymentService.Api.Application.Account.Commands.CreateAccount;
+using PaymentService.Api.Application.Account.Commands.DeleteAccount;
+using PaymentService.Api.Application.Account.Commands.TopUpBalance;
+using PaymentService.Api.Application.Account.Commands.UpdateAccountStatus;
+using PaymentService.Api.Application.Account.Commands.WithdrawBalance;
+using PaymentService.Api.Application.Account.Queries.GetCustomerBalance;
+using PaymentService.Api.Application.Account.Queries.GetCustomerTopUps;
+using PaymentService.Api.Application.Account.Queries.GetCustomerTransactions;
+using PaymentService.Api.Application.Account.Queries.GetCustomerWithdraws;
 using PaymentService.Contracts.Account.Requests;
 using PaymentService.Contracts.Account.Responses;
 using PaymentService.Contracts.Interfaces;

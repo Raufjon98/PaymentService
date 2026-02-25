@@ -8,7 +8,7 @@ using PaymentService.Contracts.Account.Requests;
 using PaymentService.Contracts.Account.Responses;
 using PaymentService.Contracts.Transaction.Enum;
 
-namespace PaymentService.Api.Application.Account.Commands;
+namespace PaymentService.Api.Application.Account.Commands.WithdrawBalance;
 
 public record WithdrawBalanceCommand(WithdrawRequest WithdrawRequest) : IRequest<BalanceOperationResponse>;
 

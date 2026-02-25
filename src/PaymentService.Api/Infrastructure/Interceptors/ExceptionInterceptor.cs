@@ -28,6 +28,22 @@ public class ExceptionInterceptor : Interceptor
         {
             throw new RpcException(new Status(StatusCode.AlreadyExists, e.Message));
         }
+        catch (ValidationException ex)
+        {
+            var metadata = new Metadata();
+
+            foreach (var error in ex.Errors)
+            {
+                foreach (var message in error.Value)
+                {
+                    metadata.Add(error.Key, message);
+                }
+            }
+
+            throw new RpcException(
+                new Status(StatusCode.InvalidArgument, ex.Message),
+                metadata);
+        }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
