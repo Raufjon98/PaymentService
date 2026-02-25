@@ -6,7 +6,7 @@ using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Account.Events;
 using PaymentService.Contracts.Account.Responses;
 
-namespace PaymentService.Api.Application.Account.Commands;
+namespace PaymentService.Api.Application.Account.Commands.CreateAccount;
 
 public record CreateAccountCommand(Guid CustomerId) : IRequest<AccountResponse>;
 

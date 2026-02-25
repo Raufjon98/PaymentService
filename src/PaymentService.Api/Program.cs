@@ -1,4 +1,5 @@
 using System.Reflection;
+using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Api.MagicOnion.Services;
 using PaymentService.Contracts.Interfaces;
 using MediatR;
+using PaymentService.Api.Application.Common.Behaviors;
 using PaymentService.Api.Infrastructure.Interceptors;
 using RabbitMQ.Client;
 
@@ -49,6 +51,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
 
 var app = builder.Build();
 

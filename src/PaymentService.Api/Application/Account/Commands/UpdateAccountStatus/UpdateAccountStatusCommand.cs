@@ -8,7 +8,7 @@ using PaymentService.Contracts.Account.Events;
 using PaymentService.Contracts.Account.Requests;
 using PaymentService.Contracts.Account.Responses;
 
-namespace PaymentService.Api.Application.Account.Commands;
+namespace PaymentService.Api.Application.Account.Commands.UpdateAccountStatus;
 
 public record UpdateAccountStatusCommand(UpdateAccountStatusRequest UpdateAccountStatusRequest)
     : IRequest<AccountResponse>;

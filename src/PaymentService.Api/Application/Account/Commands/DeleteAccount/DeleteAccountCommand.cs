@@ -5,7 +5,7 @@ using PaymentService.Api.Application.Common.Exceptions;
 using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Account.Events;
 
-namespace PaymentService.Api.Application.Account.Commands;
+namespace PaymentService.Api.Application.Account.Commands.DeleteAccount;
 
 public record DeleteAccountCommand(Guid CustomerId) : IRequest<bool>;
 

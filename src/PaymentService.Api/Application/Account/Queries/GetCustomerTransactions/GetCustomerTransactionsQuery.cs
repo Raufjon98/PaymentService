@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Transaction.Responses;
 
-namespace PaymentService.Api.Application.Account.Queries;
+namespace PaymentService.Api.Application.Account.Queries.GetCustomerTransactions;
 
 public record GetCustomerTransactionsQuery(Guid CustomerId) : IRequest<List<TransactionResult>>;
 

@@ -5,7 +5,7 @@ using PaymentService.Api.Domain.Entities;
 using PaymentService.Api.Infrastructure.Data;
 using PaymentService.Contracts.Account.Responses;
 
-namespace PaymentService.Api.Application.Account.Queries;
+namespace PaymentService.Api.Application.Account.Queries.GetCustomerBalance;
 
 public record GetCustomerBalanceQuery(Guid CustomerId) : IRequest<BalanceOperationResponse>;
 
